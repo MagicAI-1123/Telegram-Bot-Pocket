@@ -1,0 +1,42 @@
+Hey,
+Hope you are doing well.
+
+Thanks again for your order!
+
+Contents:
+-> pocketoption.zip (Contains python scripts, credentials.env, docs.txt and requirements.txt files, respectively.)
+-> guide.mp4 (Guide video)
+-> screenshot.png (Portfolio sample)
+
+credentials.env:
+-> You can put "email", "password", "google auth secret key and "telegram bot token" in this file.
+ (I have already set up the current ones in this file. Make sure to update them once you have
+ done any changes regarding them)
+
+
+Installation:
+-> Recommended Python version is 3.10+ or above.
+-> Install modules using the following command:
+   python -m pip install -r requirements.txt
+
+-> Run the Python script using
+   python main.py
+(In the case of Linux or MacOS, use python3 instead of Python.)
+
+How it works?
+-> After starting the script, it will try to login to the dashboard by
+  loading the old session cookies (if saved earlier) or doing the login process using the 
+  credentials loaded from "credentials.env" file. It will save the session cookies if its a new login.
+-> After logging-in, it will scrape the latest data from the dashboard, update the local database and send alerts accordingly.
+-> There are three operations scheduled to run at specific interval of time:
+  1. Scraping Latest data -> scheduled to run at "59th" minute of every hour.
+  2. Sending Alert to Telegram -> scheduled to run at ":00" timing of every hour.
+  3. The third and final job is "Auto-Withdrawal". It will run at ":01" and will check the condition for "withdrawal" and will alert you on telegram on successful withdrawal.
+-> That's it.
+
+
+If there are any problems, please let me know. I'll get back to you as soon as I can.
+
+I am looking forward to working with you again.
+Thanks again and have a great day! :)
+MK

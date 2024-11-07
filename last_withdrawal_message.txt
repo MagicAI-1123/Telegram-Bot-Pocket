@@ -1,0 +1,6 @@
+🏧 Withdrawal requested
+ℹ️ Request initiated: Bot
+💲 Amount: $10.0
+ℹ️ Payment method: 🏦 Wallet
+=========================
+Tether TRC20: TKMWss99HGA2G44bYPub8Yc136MqqdJjEq
