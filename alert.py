@@ -52,6 +52,8 @@ def formatted_message(value_type: str, *args) -> str:
             format_percentage(args[4]) + f" ({format_percentage_change(args[9])})"
         )
     else:
+        if not args[1]:
+            return None
         return "\n".join(mapped_lines) % (
             "{:,.2f} ({})".format(args[2], format_currency(args[3])),
             format_currency(args[1]),

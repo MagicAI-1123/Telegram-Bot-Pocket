@@ -272,8 +272,16 @@ async def process_statistics(period: str, account_status: str = None, update_db:
                         old_bonus=bonus,
                         account_status=account_status
                     )
+                    await io_obj.save()
+                    
+                    old_deposits = 0
+                    old_commission = 0
+                    old_withdrawals = 0
+                    old_hold = 0
+                    old_pool = 0
+                    old_balance = 0
+                    old_bonus = 0
                 else:
-                    # Store old values before updating
                     old_deposits = io_obj.deposits
                     old_commission = io_obj.commission
                     old_withdrawals = io_obj.withdrawals
@@ -282,35 +290,16 @@ async def process_statistics(period: str, account_status: str = None, update_db:
                     old_balance = io_obj.balance
                     old_bonus = io_obj.bonus
 
-                    # Update the model using update() instead of update_from_dict()
-                    await models.Statistics.filter(id=io_obj.id).update(
-                        deposits=deposits,
-                        commission=commission,
-                        withdrawals=withdrawals,
-                        hold=hold,
-                        pool=pool,
-                        balance=balance,
-                        bonus=bonus,
-                        account_status=account_status,
-                        old_deposits=old_deposits,
-                        old_commission=old_commission,
-                        old_withdrawals=old_withdrawals,
-                        old_hold=old_hold,
-                        old_pool=old_pool,
-                        old_balance=old_balance,
-                        old_bonus=old_bonus
-                    )
-                    # Refresh the instance to get updated values
-                    await io_obj.refresh_from_db()
+            # print("io_obj.deposits: ", old_deposits)
+            # print("io_obj.commission: ", old_commission)
+            # print("io_obj.withdrawals: ", old_withdrawals)
+            # print("io_obj.hold: ", old_hold)
+            # print("io_obj.pool: ", old_pool)
+            # print("io_obj.balance: ", old_balance)
+            # print("io_obj.bonus: ", old_bonus)
+            
+            # print(res_json)
 
-                old_deposits = io_obj.deposits
-                old_commission = io_obj.commission
-                old_withdrawals = io_obj.withdrawals
-                old_hold = io_obj.hold
-                old_pool = io_obj.pool or pool
-                old_balance = io_obj.balance
-                old_bonus = io_obj.bonus
-                
             change_in_deposits = round(deposits - old_deposits, 2)
             change_in_commission = round(commission - old_commission, 2)
             change_in_withdrawals = round(withdrawals - old_withdrawals, 2)
@@ -406,6 +395,8 @@ async def process_statistics(period: str, account_status: str = None, update_db:
     })
     
     last_week_data = await get_last_week_data()
+    if not last_week_data:
+        last_week_data = io_log_obj
     # print("last_week_data-deposits: ", last_week_data.deposits)
     # print("last_week_data-commission: ", last_week_data.commission)
     # print("last_week_data-withdrawals: ", last_week_data.withdrawals)
@@ -695,8 +686,8 @@ def validate_minute(minute: int) -> bool:
 
 def validate_minute_withdrawal() -> bool:
     current_minute = datetime.now(tz=models.pytz.utc).time().minute
-    return current_minute % 5 == 0
-    # return True
+    # return current_minute % 5 == 0
+    return True
 
 def get_error(res: httpx.Response) -> str:
     data = bs(res.text, "lxml")
@@ -753,14 +744,14 @@ async def test_func():
     print(core.chat_ids)
     for period in current_stats:
         stats = current_stats[period]
-        print("stats: ", stats)
+        # print("stats: ", stats)
         # print("processed_message: ", format_only_change(stats, period))
         if processed_message := format_only_change(stats, period):
             for chat_id in core.chat_ids:
                 print("chat_id: ", chat_id)
                 await send_message(chat_id, text=core.fix_message_format(processed_message))
                 # print(processed_message)
-                print(core.fix_message_format(processed_message))
+                # print(core.fix_message_format(processed_message))
     
 async def broadcast(message: types.Message = None) -> None:
     if message:
@@ -770,7 +761,7 @@ async def broadcast(message: types.Message = None) -> None:
     current_stats = {}
     PROCESSED = False
     ALERT_SENT = False
-    # await test_func()
+    await test_func()
     # return
     while BROADCAST_EVENT.is_set():
         # print("BROADCAST_EVENT.is_set(): ", BROADCAST_EVENT.is_set())
