@@ -417,33 +417,35 @@ async def process_statistics(period: str, account_status: str = None, update_db:
 
 
 def format_only_change(stats: dict, period: str) -> str:
-    final_message = "\n\n".join([
-        message.strip()
-        for message in [
-            alert.formatted_message(
-                "hold", stats["hold_old"], stats["hold_change"], stats["hold_current"], stats["week_change_in_hold"],
-            ),
-            alert.formatted_message(
-                "deposits", stats["deposits_old"], stats["deposits_change"], stats["deposits_current"], stats["week_change_in_deposits"],
-            ),
-            alert.formatted_message(
-                "withdrawals", stats["withdrawals_old"], stats["withdrawals_change"], stats["withdrawals_current"], stats["week_change_in_withdrawals"],
-            ),
-            alert.formatted_message(
-                "commission",  stats["commission_old"], stats["commission_change"], stats["commission_current"], stats["week_change_in_commission"],
-            ),
-            alert.formatted_message(
-                "pool", stats["pool_old"], stats["pool_change"], stats["pool_current"], stats["week_change_in_pool"],
-            ),
-            alert.formatted_message(
-                "balance", stats["balance_old"], stats["balance_change"], stats["balance_current"], stats["week_change_in_balance"],
-            ),
-            alert.formatted_message(
-                "bonus", stats["bonus_old"], stats["bonus_change"], stats["bonus_current"], stats["week_change_in_bonus"],
-            )
-        ]
-        if message and message.strip()
-    ])
+    final_message = None
+    if stats["hold_change"]:
+        final_message = "\n\n".join([
+            message.strip()
+            for message in [
+                alert.formatted_message(
+                    "hold", stats["hold_old"], stats["hold_change"], stats["hold_current"], stats["week_change_in_hold"],
+                ),
+                alert.formatted_message(
+                    "deposits", stats["deposits_old"], stats["deposits_change"], stats["deposits_current"], stats["week_change_in_deposits"],
+                ),
+                alert.formatted_message(
+                    "withdrawals", stats["withdrawals_old"], stats["withdrawals_change"], stats["withdrawals_current"], stats["week_change_in_withdrawals"],
+                ),
+                alert.formatted_message(
+                    "commission",  stats["commission_old"], stats["commission_change"], stats["commission_current"], stats["week_change_in_commission"],
+                ),
+                alert.formatted_message(
+                    "pool", stats["pool_old"], stats["pool_change"], stats["pool_current"], stats["week_change_in_pool"],
+                ),
+                alert.formatted_message(
+                    "balance", stats["balance_old"], stats["balance_change"], stats["balance_current"], stats["week_change_in_balance"],
+                ),
+                alert.formatted_message(
+                    "bonus", stats["bonus_old"], stats["bonus_change"], stats["bonus_current"], stats["week_change_in_bonus"],
+                )
+            ]
+            if message and message.strip()
+        ])
 
     if final_message:
         final_message += "\n\n" + alert.formatted_message(
