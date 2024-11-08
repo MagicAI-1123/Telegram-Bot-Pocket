@@ -59,6 +59,23 @@ def formatted_message(value_type: str, *args) -> str:
             format_currency(args[1]),
             "{:,.2f}".format(float(args[0]))
         )
+        
+def formatted_message_even_no_change(value_type: str, *args) -> str:
+    mapped_lines = mapping[value_type]
+    if value_type == "bottom":
+        return "\n".join(mapped_lines) % (
+            "{:,.0f} ({:,})".format(args[0], args[5]),  # visitors (whole number)
+            "{:,.0f} ({:,})".format(args[1], args[6]),  # registrations (whole number)
+            format_percentage(args[2]) + f" ({format_percentage_change(args[7])})",
+            "{:,.0f} ({:,})".format(args[3], args[8]),  # FTDs (whole number)
+            format_percentage(args[4]) + f" ({format_percentage_change(args[9])})"
+        )
+    else:
+        return "\n".join(mapped_lines) % (
+            "{:,.2f} ({})".format(args[2], format_currency(args[3])),
+            format_currency(args[1]),
+            "{:,.2f}".format(float(args[0]))
+        )
 
 
 def formatted_message_compare(value_type: str, *args) -> str:

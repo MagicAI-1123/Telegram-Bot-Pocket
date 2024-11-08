@@ -83,7 +83,6 @@ async def db_init():
 async def db_close():
     await Tortoise.close_connections()
 
-
 async def fetch(url: str, **kwargs) -> httpx.Response:
     try:
         return await core.session.get(url, **kwargs)
@@ -455,6 +454,44 @@ def format_only_change(stats: dict, period: str) -> str:
 
     return final_message
 
+def format_even_no_change(stats: dict, period: str) -> str:
+    final_message = "\n\n".join([
+        message.strip()
+        for message in [
+            alert.formatted_message_even_no_change(
+                "hold", stats["hold_old"], stats["hold_change"], stats["hold_current"], stats["week_change_in_hold"],
+            ),
+            alert.formatted_message_even_no_change(
+                "deposits", stats["deposits_old"], stats["deposits_change"], stats["deposits_current"], stats["week_change_in_deposits"],
+            ),
+            alert.formatted_message_even_no_change(
+                "withdrawals", stats["withdrawals_old"], stats["withdrawals_change"], stats["withdrawals_current"], stats["week_change_in_withdrawals"],
+            ),
+            alert.formatted_message_even_no_change(
+                "commission",  stats["commission_old"], stats["commission_change"], stats["commission_current"], stats["week_change_in_commission"],
+            ),
+            alert.formatted_message_even_no_change(
+                "pool", stats["pool_old"], stats["pool_change"], stats["pool_current"], stats["week_change_in_pool"],
+            ),
+            alert.formatted_message_even_no_change(
+                "balance", stats["balance_old"], stats["balance_change"], stats["balance_current"], stats["week_change_in_balance"],
+            ),
+            alert.formatted_message_even_no_change(
+                "bonus", stats["bonus_old"], stats["bonus_change"], stats["bonus_current"], stats["week_change_in_bonus"],
+            )
+        ]
+        if message and message.strip()
+    ])
+
+    if final_message:
+        final_message += "\n\n" + alert.formatted_message_even_no_change(
+            "bottom", stats["visitors"], stats["registrations"], stats["registrations_avg"], stats["ftd"], stats["ftd_avg"],
+            stats["week_change_in_visitors"], stats["week_change_in_registrations"], stats["week_change_in_registrations_avg"], stats["week_change_in_ftd"], stats["week_change_in_ftd_avg"]
+        )
+        final_message += "\n\n⚙️ Account Status: %s\n\n📅 %s" % (stats["account_status"], period)
+
+    return final_message
+
 
 def format_comparison(previous_obj: models.StatisticsLog, current_obj: models.StatisticsLog, filter: str, data: dict) -> str:
     change_in_deposits = round(current_obj.deposits - previous_obj.deposits, 2)
@@ -746,7 +783,7 @@ async def test_func():
         stats = current_stats[period]
         # print("stats: ", stats)
         # print("processed_message: ", format_only_change(stats, period))
-        if processed_message := format_only_change(stats, period):
+        if processed_message := format_even_no_change(stats, period):
             for chat_id in core.chat_ids:
                 print("chat_id: ", chat_id)
                 await send_message(chat_id, text=core.fix_message_format(processed_message))
@@ -1081,8 +1118,8 @@ async def monitor_withdrawal(message: types.Message = None) -> None:
     # await monitor_test(history_obj)
     # return
     while WITHDRAWAL_EVENT.is_set():
-        # print("models.is_auto_withdrawal_active(): ", await models.is_auto_withdrawal_active())
-        # print("validate_minute_withdrawal(): ", validate_minute_withdrawal())
+        print("models.is_auto_withdrawal_active(): ", await models.is_auto_withdrawal_active())
+        print("validate_minute_withdrawal(): ", validate_minute_withdrawal())
         try:
             if not PROCESSED:
                 if validate_minute_withdrawal():
